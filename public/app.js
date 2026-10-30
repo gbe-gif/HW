@@ -1,0 +1,65 @@
+const map = document.querySelector('.map-canvas');
+if (map) {
+  const viewport = document.querySelector('.map-scroll');
+  const list = document.querySelector('.place-list');
+  const zoomControls = document.querySelector('.zoom-controls');
+  const zoomLabel = document.querySelector('#zoom-level');
+  let zoom = 1;
+  const centerMap = () => { viewport.scrollLeft = Math.max(0, (viewport.scrollWidth - viewport.clientWidth) / 2); };
+  requestAnimationFrame(centerMap);
+  document.querySelectorAll('[data-filter]').forEach(button => button.addEventListener('click', () => {
+    document.querySelectorAll('[data-filter]').forEach(b => {
+      const active = b === button;
+      b.classList.toggle('active', active);
+      b.setAttribute('aria-pressed', String(active));
+    });
+    document.querySelectorAll('[data-type]').forEach(place => {
+      place.hidden = button.dataset.filter !== 'all' && place.dataset.type !== button.dataset.filter;
+    });
+  }));
+  document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click', () => {
+    const isMap = button.dataset.view === 'map';
+    viewport.hidden = !isMap;
+    list.hidden = isMap;
+    document.querySelector('.mobile-map-hint').hidden = !isMap;
+    zoomControls.hidden = !isMap;
+    document.querySelectorAll('[data-view]').forEach(b => {
+      b.classList.toggle('active', b === button);
+      b.setAttribute('aria-pressed', String(b === button));
+    });
+  }));
+  const setZoom = value => {
+    zoom = Math.max(1, Math.min(1.6, Math.round(value * 10) / 10));
+    map.style.width = `${zoom * 100}%`;
+    map.style.minWidth = `${700 * zoom}px`;
+    zoomLabel.value = `${Math.round(zoom * 100)}%`;
+    document.querySelector('[data-zoom="out"]').disabled = zoom === 1;
+    document.querySelector('[data-zoom="in"]').disabled = zoom === 1.6;
+  };
+  document.querySelectorAll('[data-zoom]').forEach(button => button.addEventListener('click', () => {
+    if (button.dataset.zoom === 'reset') { setZoom(1); centerMap(); }
+    else setZoom(zoom + (button.dataset.zoom === 'in' ? .2 : -.2));
+  }));
+  document.querySelector('[data-zoom="out"]').disabled = true;
+  fetch('/places.json').then(response => {
+    if (!response.ok) throw new Error('Place descriptions unavailable');
+    return response.json();
+  }).then(places => {
+    const descriptions = new Map(places.map(place => [place.id, place]));
+    document.querySelectorAll('[data-place]').forEach(pin => {
+      const show = () => {
+        const place = descriptions.get(pin.dataset.place);
+        if (!place) return;
+        document.querySelector('#story-label').textContent = `${place.number} / ${place.en}`;
+        document.querySelector('#story-title').textContent = place.name;
+        const artwork = document.querySelector('#story-art');
+        artwork.src = '/illustrations/' + (place.type === 'homes' ? place.id : 'library') + '.svg';
+        artwork.alt = place.type === 'homes' ? place.name + ' 콘셉트 일러스트' : '벤크로프트 캠퍼스 콘셉트 일러스트';
+        document.querySelector('#story-summary').textContent = place.summary;
+        document.querySelector('#story-link').href = pin.getAttribute('href');
+      };
+      pin.addEventListener('pointerenter', show);
+      pin.addEventListener('focus', show);
+    });
+  }).catch(() => { /* All place links and full descriptions remain available without this enhancement. */ });
+}
