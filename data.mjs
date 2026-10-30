@@ -6,8 +6,8 @@ export const places = [
   { id: 'gym', name: '그린 그리핀', en: 'THE GREEN GRIFFIN', type: 'campus', x: 34, y: 46, number: '05', eyebrow: '불 꺼진 체육관', summary: '어두운 조도 아래 하얀 천과 인체 모형이 놓인 체육센터.', facts: ['운동부 전용 구역과 일반 구역이 나뉜 대형 체육센터.', '축제에는 어두운 조도와 하얀 천, 인체 모형으로 연출되는 공간.'] },
   { id: 'pond', name: '중앙연못 숲길', en: 'THE POND WALK', type: 'campus', x: 51, y: 43, number: '06', eyebrow: '혼자 걷기에는 조금', summary: '고딕의 동쪽과 유리의 서쪽 사이, 소문이 머무는 숲길.', facts: ['캠퍼스의 오래된 동쪽과 현대적인 서쪽을 가르는 중앙연못.', '밤에 혼자 지나가는 이 앞에 총장 동상이 나타나 앞섶을 만지고 달아난다는 괴담.'] },
   { id: 'bridge', name: '유리연결교', en: 'THE GLASS BRIDGE', type: 'campus', x: 45, y: 10, number: '07', eyebrow: '자정의 목격담', summary: '의대와 1공학관 사이, 자정에 시작되는 우스운 괴담.', facts: ['의대와 1공학관을 잇는 유리 연결교.', '자정이면 트월킹하는 귀신이 나타난다는 소문.'] },
-  { id: 'declan', name: '데클란의 집', en: 'CEDAR HOLLOW', type: 'homes', x: 12, y: 24, number: '08', eyebrow: 'Pine Ridge · Cedar Hollow', summary: '고요한 주택가 안쪽, 미니멀한 방과 가벽 뒤의 서버룸.', facts: ['파인 리지 주택 단지 안쪽의 시더 홀로에 자리한 집.', '공대 쪽 서문까지 차량 10분, 콜튼의 집까지 도보 10분.'] },
-  { id: 'colton', name: '콜튼의 집', en: 'MAPLE CREST', type: 'homes', x: 15, y: 68, number: '09', eyebrow: 'Pine Ridge · Maple Crest', summary: '작은 앞마당과 넓은 차고를 품은 황색 벽돌집.', facts: ['파인 리지 바깥쪽 메이플 크레스트의 황색 벽돌 2층집.', '작은 앞마당과 넓은 차고를 갖춘 외관.', '캠퍼스 정문까지 차량 13분, 체육센터까지 차량 7분.', '데클란의 집까지 도보 10분.'] },
+  { id: 'declan', name: '데클란의 집', en: 'CEDAR HOLLOW', type: 'homes', x: 12, y: 43, number: '08', eyebrow: 'Pine Ridge · Cedar Hollow', summary: '고요한 주택가 안쪽, 미니멀한 방과 가벽 뒤의 서버룸.', facts: ['파인 리지 주택 단지 안쪽의 시더 홀로에 자리한 집.', '공대 쪽 서문까지 차량 10분, 콜튼의 집까지 도보 10분 이내.'] },
+  { id: 'colton', name: '콜튼의 집', en: 'MAPLE CREST', type: 'homes', x: 18, y: 56, number: '09', eyebrow: 'Pine Ridge · Maple Crest', summary: '작은 앞마당과 넓은 차고를 품은 황색 벽돌집.', facts: ['파인 리지 바깥쪽 메이플 크레스트의 황색 벽돌 2층집.', '작은 앞마당과 넓은 차고를 갖춘 외관.', '캠퍼스 정문까지 차량 13분, 체육센터까지 차량 7분.', '데클란의 집까지 도보 10분 이내.'] },
   { id: 'jace', name: '제이스의 집', en: 'C.QE PENTHOUSE', type: 'homes', x: 86, y: 31, number: '10', eyebrow: 'C.QE · Top-floor duplex', summary: '도시의 불빛을 내려다보는 최상층 복층 펜트하우스.', facts: ['캠퍼스 인근 최고급 레지던스 C.QE의 최상층 복층 펜트하우스.', '인문대 쪽 동문에서 차량 15분.'] },
   { id: 'toby', name: '토비의 집', en: 'CHESTNUT HALL', type: 'homes', x: 87, y: 73, number: '11', eyebrow: 'Chestnut Hall · No. 1701', summary: '우드와 화이트 사이, 게임과 작업을 위한 1701호.', facts: ['대학 근처 신축 고급 주상복합 체스트넛 홀의 1701호.', '지상 28층 건물 안, 침실 2개와 욕실 2개로 구성된 집.', '따뜻한 우드와 화이트가 어우러지는 실내.', '복도의 미세한 단차 때문에 매끄러운 물건과 옆집 택배가 문 앞으로 미끄러져 오는 구조.', '흘러온 물건을 확인하고 이웃에게 돌려주는 토비의 일상.'] }
 ];
@@ -32,3 +32,4 @@ export const houses = [
   ] }
 ];
 export const href = p => `/${p.type === 'homes' ? 'residences' : 'campus'}/#${p.id}`;
+
