@@ -8,8 +8,8 @@ export const places = [
   { id: 'bridge', name: '유리연결교', en: 'THE GLASS BRIDGE', type: 'campus', x: 45, y: 10, number: '07', eyebrow: '자정의 목격담', summary: '의대와 1공학관 사이, 자정에 시작되는 우스운 괴담.', facts: ['의대와 1공학관을 잇는 유리 연결교.', '자정이면 트월킹하는 귀신이 나타난다는 소문.'] },
   { id: 'declan', name: '데클란의 집', en: 'CEDAR HOLLOW', type: 'homes', x: 12, y: 43, number: '08', eyebrow: 'Pine Ridge · Cedar Hollow', summary: '고요한 주택가 안쪽, 미니멀한 방과 가벽 뒤의 서버룸.', facts: ['파인 리지 주택 단지 안쪽의 시더 홀로에 자리한 집.', '공대 쪽 서문까지 차량 10분, 콜튼의 집까지 도보 10분 이내.'] },
   { id: 'colton', name: '콜튼의 집', en: 'MAPLE CREST', type: 'homes', x: 18, y: 56, number: '09', eyebrow: 'Pine Ridge · Maple Crest', summary: '작은 앞마당과 넓은 차고를 품은 황색 벽돌집.', facts: ['파인 리지 바깥쪽 메이플 크레스트의 황색 벽돌 2층집.', '작은 앞마당과 넓은 차고를 갖춘 외관.', '캠퍼스 정문까지 차량 13분, 체육센터까지 차량 7분.', '데클란의 집까지 도보 10분 이내.'] },
-  { id: 'jace', name: '제이스의 집', en: 'C.QE PENTHOUSE', type: 'homes', x: 86, y: 31, number: '10', eyebrow: 'C.QE · Top-floor duplex', summary: '도시의 불빛을 내려다보는 최상층 복층 펜트하우스.', facts: ['캠퍼스 인근 최고급 레지던스 C.QE의 최상층 복층 펜트하우스.', '인문대 쪽 동문에서 차량 15분.'] },
-  { id: 'toby', name: '토비의 집', en: 'CHESTNUT HALL', type: 'homes', x: 87, y: 73, number: '11', eyebrow: 'Chestnut Hall · No. 1701', summary: '우드와 화이트 사이, 게임과 작업을 위한 1701호.', facts: ['대학 근처 신축 고급 주상복합 체스트넛 홀의 1701호.', '지상 28층 건물 안, 침실 2개와 욕실 2개로 구성된 집.', '따뜻한 우드와 화이트가 어우러지는 실내.', '복도의 미세한 단차 때문에 매끄러운 물건과 옆집 택배가 문 앞으로 미끄러져 오는 구조.', '흘러온 물건을 확인하고 이웃에게 돌려주는 토비의 일상.'] }
+  { id: 'jace', name: '제이스의 집', en: 'C.QE PENTHOUSE', type: 'homes', x: 86, y: 31, number: '10', eyebrow: 'C.QE · Top-floor duplex', summary: '도시의 불빛을 내려다보는 최상층 복층 펜트하우스.', facts: ['동문 너머 번화가에 자리한 최고급 레지던스 C.QE의 최상층 복층 펜트하우스.', '인문대 쪽 동문에서 차량 15분.'] },
+  { id: 'toby', name: '토비의 집', en: 'CHESTNUT HALL', type: 'homes', x: 17, y: 20, number: '11', eyebrow: 'Chestnut Hall · No. 1701', summary: '우드와 화이트 사이, 게임과 작업을 위한 1701호.', facts: ['공대 쪽 서편에 자리한 신축 고급 주상복합 체스트넛 홀의 1701호.', '지상 28층 건물 안, 침실 2개와 욕실 2개로 구성된 집.', '따뜻한 우드와 화이트가 어우러지는 실내.', '복도의 미세한 단차 때문에 매끄러운 물건과 옆집 택배가 문 앞으로 미끄러져 오는 구조.', '흘러온 물건을 확인하고 이웃에게 돌려주는 토비의 일상.'] }
 ];
 export const houses = [
   { id: 'declan', title: 'Quiet outside.\nWired inside.', style: 'house', levels: [

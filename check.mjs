@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile,stat} from 'node:fs/promises';
 import {places,houses} from './data.mjs';
+import {cast,bet} from './characters.mjs';
 const routes=['','campus','after-dark','residences','characters','supporting'];
 const root=new URL('./dist/',import.meta.url);
 let checked=0;
@@ -26,3 +27,20 @@ for(const house of houses)for(const [, ,facts] of house.levels)for(const fact of
 const campus=await readFile(new URL('campus/index.html',root),'utf8');
 for(const place of places.filter(p=>p.type==='campus'))for(const fact of place.facts)assert(campus.includes(fact),`Missing campus detail: ${fact}`);
 console.log(`PASS: ${routes.length} pages, ${checked} internal links/assets/anchors, 11 places and all campus/residence detail entries.`);
+
+const characters=await readFile(new URL('characters/index.html',root),'utf8');
+assert.equal(cast.length,4);
+for(const person of cast){
+ assert(characters.includes('id="'+person.id+'"'));
+ assert(characters.includes(person.name));
+ assert(characters.includes(person.costume));
+ assert(characters.includes('/residences/#'+person.id));
+}
+const spoilerTag=characters.match(/<details class="spoiler-details"[^>]*>/)?.[0];
+assert(spoilerTag&&!/\bopen\b/.test(spoilerTag),'Spoilers must start closed');
+assert.deepEqual(Object.keys(bet).sort(),['premise','rules']);
+for(const privateType of ['9w8','8w7','5w4','7w8','sp/sx','sx/so','FID','Unbothered Sluggard','Social Butterfly','Galge Brain','Golden Retriever Alpha']) assert(!characters.includes(privateType),'Raw personality metadata must not be published');
+assert(!cast.find(p=>p.id==='jace').badges.some(([key])=>key==='나이'||key==='생일'),'Do not invent missing Jace metadata');
+const toby=places.find(p=>p.id==='toby');
+assert(toby.x<30,'Toby belongs to the western neighborhood');
+console.log('PASS: 4 profiles, costume/residence links, closed spoilers, public metadata and western residence.');
