@@ -63,3 +63,51 @@ if (map) {
     });
   }).catch(() => { /* All place links and full descriptions remain available without this enhancement. */ });
 }
+
+const galleryCards = document.querySelectorAll('[data-gallery-card]');
+if (galleryCards.length) {
+  const loadGalleryImage = card => {
+    const image = card.querySelector('[data-gallery-image]');
+    if (image.dataset.requested) return;
+    image.dataset.requested = 'true';
+    image.addEventListener('load', () => {
+      if (!image.naturalWidth) return;
+      card.dataset.state = 'ready';
+      image.hidden = false;
+      card.querySelector('.gallery-placeholder').hidden = true;
+      card.querySelector('.gallery-original').hidden = false;
+    }, {once:true});
+    image.addEventListener('error', () => {
+      card.dataset.state = 'unavailable';
+      image.hidden = true;
+    }, {once:true});
+    image.src = image.dataset.src;
+  };
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        loadGalleryImage(entry.target);
+      });
+    }, {rootMargin:'300px'});
+    galleryCards.forEach(card => observer.observe(card));
+  } else {
+    galleryCards.forEach(loadGalleryImage);
+  }
+  const galleryNames = {all:'전체',D:'데클란',J:'제이스',T:'토비',C:'콜튼'};
+  document.querySelectorAll('[data-gallery-filter]').forEach(button => {
+    button.addEventListener('click', () => {
+      const code = button.dataset.galleryFilter;
+      document.querySelectorAll('[data-gallery-filter]').forEach(filter => {
+        const active = filter === button;
+        filter.classList.toggle('active', active);
+        filter.setAttribute('aria-pressed', String(active));
+      });
+      document.querySelectorAll('[data-gallery-group]').forEach(group => {
+        group.hidden = code !== 'all' && group.dataset.galleryGroup !== code;
+      });
+      document.querySelector('.gallery-status').textContent = `${galleryNames[code]} · ${code === 'all' ? 44 : 11}개 이미지 자리`;
+    });
+  });
+}

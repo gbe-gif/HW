@@ -1,3 +1,4 @@
+import {renderGallery} from './gallery.mjs';
 import {renderCharacters, costumeLinks} from './character-pages.mjs';
 import {mkdir, writeFile, copyFile} from 'node:fs/promises';
 import {places, houses, href} from './data.mjs';
@@ -6,7 +7,7 @@ const out = new URL('./dist/', import.meta.url);
 const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const bullets = (items,cls='') => `<ul class="prose ${cls}">${items.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
 const arrow=icon('arrow',18);
-const routes=[['','map','지도'],['campus','campus','캠퍼스'],['after-dark','moon','축제'],['residences','home','주거지'],['characters','people','등장인물']];
+const routes=[['','map','지도'],['campus','campus','캠퍼스'],['after-dark','moon','축제'],['residences','home','주거지'],['characters','people','등장인물'],['gallery','image','수록 이미지']];
 function layout(route,title,content){return `<!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#12261d"><meta name="description" content="벤크로프트의 캠퍼스와 할로윈 축제, 그 곁의 집들. Bencroft After Dark RP 세계관 가이드."><title>${title} · Bencroft After Dark</title><link rel="icon" href="/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css"><script type="module" src="/app.js"></script></head><body data-page="${route||'map'}"><a class="skip-link" href="#main">본문으로 이동</a><header class="site-header"><a class="brand" href="/" aria-label="벤크로프트 지도 홈">${icon('leaf',32)}<span>BENCROFT<small>UNIVERSITY · EST. 1768</small></span></a><span class="header-motto">VERITAS ET INNOVATIO</span><a class="event-link" href="/after-dark/"><span class="live-dot"></span> AFTER DARK <span class="event-date">· OCT 31, 2026</span>${arrow}</a></header><main id="main" tabindex="-1">${content}</main><footer class="site-footer"><span>${icon('leaf',18)} BENCROFT UNIVERSITY</span><span>가상의 세계, 당신의 이야기.</span><span>EST. 1768 · VERITAS ET INNOVATIO</span></footer><nav class="bottom-nav" aria-label="주요 페이지">${routes.map(([path,i,label])=>`<a href="/${path?path+'/':''}" ${route===path||(path==='characters'&&route==='supporting')?'aria-current="page"':''}>${icon(i,20)}<span>${label}</span></a>`).join('')}</nav></body></html>`;}
 const pageHead=(tag,title,subtitle,extra='')=>`<header class="page-heading"><div><span class="eyebrow">${tag}</span><h1>${title}</h1>${bullets([subtitle],'intro-copy')}</div>${extra}</header>`;
@@ -35,9 +36,9 @@ await mkdir(out,{recursive:true});
 await mkdir(new URL('illustrations/',out),{recursive:true});
 await writeFile(new URL('illustrations/library.svg',out),building().replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" '));
 for(const h of houses)await writeFile(new URL('illustrations/'+h.id+'.svg',out),building(h.style).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" '));
-for(const [route,title,content] of [['','지도',home()],['campus','캠퍼스',campus()],['after-dark','할로윈 축제',festival()],['residences','주거지',residences()],['characters','주연 캐릭터',characters()],['supporting','조연 캐릭터',characters(true)]]){const dir=new URL(route?route+'/':'',out);await mkdir(dir,{recursive:true});await writeFile(new URL('index.html',dir),layout(route,title,content));}
+for(const [route,title,content] of [['','지도',home()],['campus','캠퍼스',campus()],['after-dark','할로윈 축제',festival()],['residences','주거지',residences()],['characters','주연 캐릭터',characters()],['supporting','조연 캐릭터',characters(true)],['gallery','수록 이미지',renderGallery({pageHead,arrow})]]){const dir=new URL(route?route+'/':'',out);await mkdir(dir,{recursive:true});await writeFile(new URL('index.html',dir),layout(route,title,content));}
 for(const file of ['styles.css','app.js','mark.svg'])await copyFile(new URL('./public/'+file,import.meta.url),new URL(file,out));
 await writeFile(new URL('places.json',out),JSON.stringify(places.map(({id,name,en,summary,type,number})=>({id,name,en,summary,type,number}))));
 await writeFile(new URL('404.html',out),layout('404','페이지를 찾을 수 없음',`${pageHead('404 / LOST IN BENCROFT','A wrong turn.<br><em>A new beginning.</em>','해당 주소에서 찾을 수 없는 페이지.')}<a class="primary-link" href="/">지도로 돌아가기 ${arrow}</a>`));
-console.log('Built 6 static pages, 404 page and local assets in dist/.');
+console.log('Built 7 static pages, 404 page and local assets in dist/.');
 

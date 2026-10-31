@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile,stat} from 'node:fs/promises';
 import {places,houses} from './data.mjs';
 import {cast,bet} from './characters.mjs';
-const routes=['','campus','after-dark','residences','characters','supporting'];
+const routes=['','campus','after-dark','residences','characters','supporting','gallery'];
 const root=new URL('./dist/',import.meta.url);
 let checked=0;
 for(const route of routes){
@@ -46,3 +46,13 @@ for(const detail of ['경영학을 전공하는 4학년','로건금융그룹 오
 const toby=places.find(p=>p.id==='toby');
 assert(toby.x<30,'Toby belongs to the western neighborhood');
 console.log('PASS: 4 profiles, costume/residence links, closed spoilers, public metadata and western residence.');
+
+const gallery=await readFile(new URL('gallery/index.html',root),'utf8');
+const gallerySources=[...gallery.matchAll(/data-src="([^"]+)"/g)].map(match=>match[1]);
+assert.equal(gallerySources.length,44);
+assert.equal(new Set(gallerySources).size,44);
+for(const code of ['D','J','T','C'])for(let number=1;number<=11;number++)assert(gallerySources.includes('https://gbe88.uk/HW/'+code+'_'+number+'.webp'));
+assert.equal((gallery.match(/data-gallery-group=/g)||[]).length,4);
+const mainNavigation=gallery.match(/<nav class="bottom-nav"[\s\S]*?<\/nav>/)?.[0];
+assert(mainNavigation&&mainNavigation.lastIndexOf('수록 이미지')>mainNavigation.lastIndexOf('등장인물'));
+console.log('PASS: 44 unique gallery URLs, four collections and last-position archive navigation.');
