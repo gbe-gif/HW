@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile,stat,access} from 'node:fs/promises';
 import {places,houses} from './data.mjs';
 import {cast,bet} from './characters.mjs';
+import {checkGalleryPassword} from './public/gallery-lock.js';
 const routes=['','campus','after-dark','residences','characters','gallery'];
 const root=new URL('./dist/',import.meta.url);
 let checked=0;
@@ -49,11 +50,14 @@ assert(toby.x<30,'Toby belongs to the western neighborhood');
 console.log('PASS: 4 profiles, costume/residence links, closed spoilers, public metadata and western residence.');
 
 const gallery=await readFile(new URL('gallery/index.html',root),'utf8');
-const gallerySources=[...gallery.matchAll(/data-src="([^"]+)"/g)].map(match=>match[1]);
+const adultTemplate=gallery.match(/<template id="adult-gallery-template">([\s\S]*?)<\/template>/)?.[1];
+assert(adultTemplate);
+const publicGallery=gallery.replace(/<template[\s\S]*?<\/template>/g,'');
+const gallerySources=[...publicGallery.matchAll(/data-src="([^"]+)"/g)].map(match=>match[1]);
 assert.equal(gallerySources.length,44);
 assert.equal(new Set(gallerySources).size,44);
 for(const code of ['D','J','T','C'])for(let number=1;number<=11;number++)assert(gallerySources.includes('https://gbe88.uk/HW/'+code+'_'+number+'.webp'));
-assert.equal((gallery.match(/data-gallery-group=/g)||[]).length,4);
+assert.equal((publicGallery.match(/data-gallery-group=/g)||[]).length,4);
 const mainNavigation=gallery.match(/<nav class="bottom-nav"[\s\S]*?<\/nav>/)?.[0];
 assert(mainNavigation&&mainNavigation.lastIndexOf('수록 이미지')>mainNavigation.lastIndexOf('등장인물'));
 console.log('PASS: 44 unique gallery URLs, four collections and last-position archive navigation.');
@@ -69,3 +73,16 @@ assert.equal(traitPanels.filter(tag=>tag.includes('data-trait-version="adult"'))
 assert(traitPanels.every(tag=>! /\bopen\b/.test(tag)),'Trait panels must start collapsed');
 for(const person of cast){assert(person.safeRomance.length>0);assert(person.intimacy.length>0);}
 console.log('PASS: four safe and four adult trait panels, independently collapsed by default.');
+
+const adultSources=[...adultTemplate.matchAll(/data-src="([^"]+)"/g)].map(match=>match[1]);
+assert.equal(adultSources.length,32);
+for(const code of ['D','J','T','C'])for(let number=12;number<=19;number++)assert(adultSources.includes('https://gbe88.uk/HW/'+code+'_'+number+'.webp'));
+assert(! /<img[^>]*\ssrc=/.test(adultTemplate),'Adult images must have no active sources in the template');
+assert(gallery.includes('언세이프 버전 상세정보의 비밀번호를 입력해주세요'));
+assert(gallery.includes('name="gallery-password" type="text"'));
+assert(! /<dialog[^>]*\bopen\b/.test(gallery));
+if(process.env.GALLERY_TEST_PASSWORD){assert.equal(await checkGalleryPassword(process.env.GALLERY_TEST_PASSWORD),true);assert.equal(await checkGalleryPassword(process.env.GALLERY_TEST_PASSWORD.toUpperCase()),false);}
+assert.equal(await checkGalleryPassword('wrong'),false);
+
+assert.equal(await checkGalleryPassword(''),false);
+console.log('PASS: 32 adult slots (12–19), inert template, visible input and correct/incorrect password checks.');

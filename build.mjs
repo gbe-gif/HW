@@ -40,7 +40,7 @@ await mkdir(new URL('illustrations/',out),{recursive:true});
 await writeFile(new URL('illustrations/library.svg',out),building().replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" '));
 for(const h of houses)await writeFile(new URL('illustrations/'+h.id+'.svg',out),building(h.style).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" '));
 for(const [route,title,content] of [['','지도',home()],['campus','캠퍼스',campus()],['after-dark','할로윈 축제',festival()],['residences','주거지',residences()],['characters','주연 캐릭터',characters()],['gallery','수록 이미지',renderGallery({pageHead,arrow})]]){const dir=new URL(route?route+'/':'',out);await mkdir(dir,{recursive:true});await writeFile(new URL('index.html',dir),layout(route,title,content));}
-for(const file of ['styles.css','app.js','mark.svg'])await copyFile(new URL('./public/'+file,import.meta.url),new URL(file,out));
+for(const file of ['styles.css','app.js','gallery-lock.js','mark.svg'])await copyFile(new URL('./public/'+file,import.meta.url),new URL(file,out));
 await writeFile(new URL('places.json',out),JSON.stringify(places.map(({id,name,en,summary,type,number})=>({id,name,en,summary,type,number}))));
 await writeFile(new URL('404.html',out),layout('404','페이지를 찾을 수 없음',`${pageHead('404 / LOST IN BENCROFT','A wrong turn.<br><em>A new beginning.</em>','해당 주소에서 찾을 수 없는 페이지.')}<a class="primary-link" href="/">지도로 돌아가기 ${arrow}</a>`));
 console.log('Built 6 static pages, 404 page and local assets in dist/.');

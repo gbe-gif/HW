@@ -1,3 +1,4 @@
+import {checkGalleryPassword} from '/gallery-lock.js';
 const map = document.querySelector('.map-canvas');
 if (map) {
   const viewport = document.querySelector('.map-scroll');
@@ -64,9 +65,22 @@ if (map) {
   }).catch(() => { /* All place links and full descriptions remain available without this enhancement. */ });
 }
 
-const galleryCards = document.querySelectorAll('[data-gallery-card]');
-if (galleryCards.length) {
-  const loadGalleryImage = card => {
+const galleryPage = document.querySelector('[data-gallery-page]');
+if (galleryPage) {
+  let unlocked = false;
+  let mode = 'safe';
+  let selectedPerson = 'all';
+  const names = {all:'전체',D:'데클란',J:'제이스',T:'토비',C:'콜튼'};
+  const safeGallery = galleryPage.querySelector('[data-safe-gallery]');
+  const adultGallery = galleryPage.querySelector('[data-adult-gallery]');
+  const dialog = document.querySelector('.gallery-password-dialog');
+  const form = document.querySelector('#gallery-password-form');
+  const input = document.querySelector('#gallery-password');
+  const error = document.querySelector('#gallery-password-error');
+  const submit = form.querySelector('[type="submit"]');
+  const relock = galleryPage.querySelector('[data-gallery-relock]');
+  const loadImage = card => {
+    if (card.closest('[data-adult-gallery]') && !unlocked) return;
     const image = card.querySelector('[data-gallery-image]');
     if (image.dataset.requested) return;
     image.dataset.requested = 'true';
@@ -83,31 +97,94 @@ if (galleryCards.length) {
     }, {once:true});
     image.src = image.dataset.src;
   };
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        observer.unobserve(entry.target);
-        loadGalleryImage(entry.target);
-      });
-    }, {rootMargin:'300px'});
-    galleryCards.forEach(card => observer.observe(card));
-  } else {
-    galleryCards.forEach(loadGalleryImage);
-  }
-  const galleryNames = {all:'전체',D:'데클란',J:'제이스',T:'토비',C:'콜튼'};
-  document.querySelectorAll('[data-gallery-filter]').forEach(button => {
-    button.addEventListener('click', () => {
-      const code = button.dataset.galleryFilter;
-      document.querySelectorAll('[data-gallery-filter]').forEach(filter => {
-        const active = filter === button;
-        filter.classList.toggle('active', active);
-        filter.setAttribute('aria-pressed', String(active));
-      });
-      document.querySelectorAll('[data-gallery-group]').forEach(group => {
-        group.hidden = code !== 'all' && group.dataset.galleryGroup !== code;
-      });
-      document.querySelector('.gallery-status').textContent = `${galleryNames[code]} · ${code === 'all' ? 44 : 11}개 이미지 자리`;
+  const observer = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const card = entry.target;
+      if (card.closest('[data-gallery-group]').hidden) return;
+      if (card.closest('[data-adult-gallery]') && !unlocked) return;
+      observer.unobserve(card);
+      loadImage(card);
     });
+  }, {rootMargin:'300px'}) : null;
+  const registerImages = container => container.querySelectorAll('[data-gallery-card]').forEach(card => {
+    if (observer) observer.observe(card);
+    else loadImage(card);
   });
+  const refresh = () => {
+    safeGallery.hidden = mode !== 'safe';
+    adultGallery.hidden = mode !== 'adult' || !unlocked;
+    galleryPage.querySelectorAll('[data-gallery-group]').forEach(group => {
+      group.hidden = selectedPerson !== 'all' && group.dataset.galleryGroup !== selectedPerson;
+    });
+    galleryPage.querySelectorAll('[data-gallery-mode]').forEach(button => {
+      const active = button.dataset.galleryMode === mode;
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-pressed',String(active));
+    });
+    const perPerson = mode === 'adult' ? 8 : 11;
+    galleryPage.querySelectorAll('[data-gallery-filter]').forEach(button => {
+      const active = button.dataset.galleryFilter === selectedPerson;
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-pressed',String(active));
+      button.querySelector('span').textContent = button.dataset.galleryFilter === 'all' ? perPerson * 4 : perPerson;
+    });
+    relock.hidden = !unlocked;
+    galleryPage.querySelector('.gallery-status').textContent = `${mode === 'adult' ? '언세이프' : '세이프'} · ${names[selectedPerson]} · ${selectedPerson === 'all' ? perPerson * 4 : perPerson}개 이미지 자리`;
+  };
+  galleryPage.querySelectorAll('[data-gallery-filter]').forEach(button => button.addEventListener('click', () => {
+    selectedPerson = button.dataset.galleryFilter;
+    refresh();
+  }));
+  galleryPage.querySelectorAll('[data-gallery-mode]').forEach(button => button.addEventListener('click', () => {
+    if (button.dataset.galleryMode === 'adult' && !unlocked) {
+      form.reset();
+      error.textContent = '';
+      dialog.showModal();
+      input.focus();
+      return;
+    }
+    mode = button.dataset.galleryMode;
+    refresh();
+  }));
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (submit.disabled) return;
+    submit.disabled = true;
+    error.textContent = '';
+    try {
+      const valid = await checkGalleryPassword(input.value);
+      if (!dialog.open) return;
+      if (!valid) {
+        error.textContent = '비밀번호가 올바르지 않습니다.';
+        input.focus();
+        return;
+      }
+      unlocked = true;
+      adultGallery.append(document.querySelector('#adult-gallery-template').content.cloneNode(true));
+      mode = 'adult';
+      refresh();
+      registerImages(adultGallery);
+      dialog.close();
+    } catch {
+      error.textContent = '비밀번호를 확인하지 못했습니다. 다시 시도해주세요.';
+    } finally {
+      submit.disabled = false;
+    }
+  });
+  form.querySelector('[data-password-cancel]').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', () => { form.reset(); error.textContent = ''; });
+  relock.addEventListener('click', () => {
+    unlocked = false;
+    adultGallery.querySelectorAll('[data-gallery-card]').forEach(card => {
+      observer?.unobserve(card);
+      card.querySelector('img').removeAttribute('src');
+    });
+    adultGallery.replaceChildren();
+    mode = 'safe';
+    refresh();
+    galleryPage.querySelector('[data-gallery-mode="adult"]').focus();
+  });
+  registerImages(safeGallery);
+  refresh();
 }
