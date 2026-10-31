@@ -61,3 +61,11 @@ console.log('PASS: 44 unique gallery URLs, four collections and last-position ar
 await assert.rejects(access(new URL('supporting/index.html',root)),{code:'ENOENT'});
 for(const code of ['D','J','T','C'])assert.equal((characters.match(new RegExp('src="https://gbe88\\.uk/3/HW/'+code+'\\.webp"','g'))||[]).length,1,'Portrait must appear in the detailed profile: '+code);
 console.log('PASS: retired supporting page absent; all four profile portraits linked.');
+
+const traitPanels=[...characters.matchAll(/<details class="intimacy-details [^"]+"[^>]*>/g)].map(match=>match[0]);
+assert.equal(traitPanels.length,8);
+assert.equal(traitPanels.filter(tag=>tag.includes('data-trait-version="safe"')).length,4);
+assert.equal(traitPanels.filter(tag=>tag.includes('data-trait-version="adult"')).length,4);
+assert(traitPanels.every(tag=>! /\bopen\b/.test(tag)),'Trait panels must start collapsed');
+for(const person of cast){assert(person.safeRomance.length>0);assert(person.intimacy.length>0);}
+console.log('PASS: four safe and four adult trait panels, independently collapsed by default.');
