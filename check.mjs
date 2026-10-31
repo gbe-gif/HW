@@ -1,14 +1,15 @@
 import assert from 'node:assert/strict';
-import {readFile,stat} from 'node:fs/promises';
+import {readFile,stat,access} from 'node:fs/promises';
 import {places,houses} from './data.mjs';
 import {cast,bet} from './characters.mjs';
-const routes=['','campus','after-dark','residences','characters','supporting','gallery'];
+const routes=['','campus','after-dark','residences','characters','gallery'];
 const root=new URL('./dist/',import.meta.url);
 let checked=0;
 for(const route of routes){
  const html=await readFile(new URL(route?`${route}/index.html`:'index.html',root),'utf8');
  assert(html.includes('<html lang="ko">'),`${route}: missing language`);
  assert(html.includes('aria-label="주요 페이지"'),`${route}: missing navigation`);
+ assert(!html.includes('/supporting/')&&!html.includes('조연'), 'Retired supporting page must not appear');
  assert(!html.includes('Ⓤ'),`${route}: unprocessed user symbol`);
  for(const match of html.matchAll(/(?:href|src)="([^" ]+)"/g)){
    const path=match[1];if(!path.startsWith('/')&&!path.startsWith('#'))continue;
@@ -56,3 +57,7 @@ assert.equal((gallery.match(/data-gallery-group=/g)||[]).length,4);
 const mainNavigation=gallery.match(/<nav class="bottom-nav"[\s\S]*?<\/nav>/)?.[0];
 assert(mainNavigation&&mainNavigation.lastIndexOf('수록 이미지')>mainNavigation.lastIndexOf('등장인물'));
 console.log('PASS: 44 unique gallery URLs, four collections and last-position archive navigation.');
+
+await assert.rejects(access(new URL('supporting/index.html',root)),{code:'ENOENT'});
+for(const code of ['D','J','T','C'])assert.equal((characters.match(new RegExp('src="https://gbe88\\.uk/3/HW/'+code+'\\.webp"','g'))||[]).length,1,'Portrait must appear in the detailed profile: '+code);
+console.log('PASS: retired supporting page absent; all four profile portraits linked.');
