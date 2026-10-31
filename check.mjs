@@ -40,7 +40,9 @@ const spoilerTag=characters.match(/<details class="spoiler-details"[^>]*>/)?.[0]
 assert(spoilerTag&&!/\bopen\b/.test(spoilerTag),'Spoilers must start closed');
 assert.deepEqual(Object.keys(bet).sort(),['premise','rules']);
 for(const privateType of ['9w8','8w7','5w4','7w8','sp/sx','sx/so','FID','Unbothered Sluggard','Social Butterfly','Galge Brain','Golden Retriever Alpha']) assert(!characters.includes(privateType),'Raw personality metadata must not be published');
-assert(!cast.find(p=>p.id==='jace').badges.some(([key])=>key==='나이'||key==='생일'),'Do not invent missing Jace metadata');
+const jace=cast.find(p=>p.id==='jace');
+for(const [key,value] of [['나이','24살'],['생일','07.01'],['MBTI','ENTP']]) assert(jace.badges.some(badge=>badge[0]===key&&badge[1]===value),'Missing Jace badge: '+key);
+for(const detail of ['경영학을 전공하는 4학년','로건금융그룹 오너의 차남','GPA 3.88','약 1,100만 달러','코네티컷주 그리니치','레드애플','암브록산','바닐라 머스크','주류 수집과 주식','현재 금연 중','애스턴 마틴 DBS 볼란테','피임 도구를 늘 준비']) assert(characters.includes(detail),'Missing Jace detail: '+detail);
 const toby=places.find(p=>p.id==='toby');
 assert(toby.x<30,'Toby belongs to the western neighborhood');
 console.log('PASS: 4 profiles, costume/residence links, closed spoilers, public metadata and western residence.');
