@@ -89,7 +89,6 @@ if (galleryPage) {
       card.dataset.state = 'ready';
       image.hidden = false;
       card.querySelector('.gallery-placeholder').hidden = true;
-      card.querySelector('.gallery-original').hidden = false;
     }, {once:true});
     image.addEventListener('error', () => {
       card.dataset.state = 'unavailable';
@@ -122,15 +121,13 @@ if (galleryPage) {
       button.classList.toggle('active',active);
       button.setAttribute('aria-pressed',String(active));
     });
-    const perPerson = mode === 'adult' ? 8 : 11;
     galleryPage.querySelectorAll('[data-gallery-filter]').forEach(button => {
       const active = button.dataset.galleryFilter === selectedPerson;
       button.classList.toggle('active',active);
       button.setAttribute('aria-pressed',String(active));
-      button.querySelector('span').textContent = button.dataset.galleryFilter === 'all' ? perPerson * 4 : perPerson;
     });
     relock.hidden = !unlocked;
-    galleryPage.querySelector('.gallery-status').textContent = `${mode === 'adult' ? '언세이프' : '세이프'} · ${names[selectedPerson]} · ${selectedPerson === 'all' ? perPerson * 4 : perPerson}개 이미지 자리`;
+    galleryPage.querySelector('.gallery-status').textContent = `${mode === 'adult' ? '언세이프' : '세이프'} · ${names[selectedPerson]}`;
   };
   galleryPage.querySelectorAll('[data-gallery-filter]').forEach(button => button.addEventListener('click', () => {
     selectedPerson = button.dataset.galleryFilter;

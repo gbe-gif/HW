@@ -86,3 +86,12 @@ assert.equal(await checkGalleryPassword('wrong'),false);
 
 assert.equal(await checkGalleryPassword(''),false);
 console.log('PASS: 32 adult slots (12–19), inert template, visible input and correct/incorrect password checks.');
+
+assert(!gallery.includes('class="gallery-number"'));
+assert(!gallery.includes('class="gallery-original"'));
+assert(!gallery.includes('class="gallery-placeholder-subtitle"'));
+assert(! /<small>[DJTC]_\d+\.webp<\/small>/.test(gallery));
+assert(! /alt="[^"]*\d+번/.test(gallery));
+assert(! /href="https:\/\/gbe88\.uk\/HW\/[DJTC]_\d+\.webp"/.test(gallery));
+assert(!gallery.includes('<small>1–11</small>')&&!gallery.includes('<small>12–19</small>'));
+console.log('PASS: gallery numbering, filenames, ranges and direct original links are absent from the interface.');
